@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="Car.js"></script>
+    <script src="Rectangle.js"></script>
+    <script src="Circle.js"></script>
+</head>
+<body>
+<canvas id="myCanvas" width="1200" height="600" style="border: 2px solid green"></canvas>
+</body>
+</html>
+<script>
+    let canvas = document.getElementById('myCanvas');
+    let ctx = canvas.getContext('2d');
+    const image = new Image();
+    let car = new Car(image, 0, 0, 100, 100, 'image/tank_up.png');
+    let rect = new Rectangle(200, 50, 200, 100, 'blue');
+    let circle = new Circle(800, 350, 100, 'green')
+    let arrRandom = [];
+    let arrRandom2 = []
+    let count = 0;
+
+    function drawRandomRect() {
+        count++;
+        let x;
+        let y;
+        for (let i = 0; i < 3; i++) {
+            // x = Math.floor(Math.random()*100)+800;
+            // y = Math.floor(Math.random()*100)+100;
+            let rectRandom = new Rectangle(0, 0, 100, 30, 'blue');
+            let rectRandom2= new Rectangle(0,0,100,30,'green');
+            //
+            if (arrRandom.length > 3) {
+                break
+            } else {
+                arrRandom.push(rectRandom);
+                arrRandom2.push(rectRandom2);
+                // arrRandom.push(rectRandom2)
+            }
+            if (arrRandom2.length > 3) {
+                break
+            } else {
+                arrRandom2.push(rectRandom2);
+                // arrRandom.push(rectRandom2)
+            }
+        }
+
+        clearCanvas();
+        for (let i = 0; i < 2; i++) {
+            for (let j = 0; j < arrRandom.length; j++) {
+                console.log('j = ', j)
+                arrRandom[i].x = j * arrRandom[i].width + j * 150 + count * 50;
+                // arrRandom2[i].x = j * arrRandom2[i].width + j * 100 + count * 50;
+                // arrRandom[i].y = i * arrRandom[i].height + i* 500 + count * 50;
+                console.log('arr[i] = ', arrRandom[i])
+                arrRandom[i].drawRect(ctx)
+                // arrRandom2[i].drawRect(ctx)
+                // arrRandom[i].drawRect(ctx)
+
+            }
+
+
+            // arrRandom[i].y = i*arrRandom[i].height + 50;
+            // arrRandom[i].drawRect(ctx)
+        }
+        for (let i = 0; i < 2; i++) {
+            for (let j = 0; j < arrRandom2.length; j++) {
+                console.log('j = ', j)
+                // arrRandom[i].x = j * arrRandom[i].width + j * 200 + count * 50;
+                arrRandom2[i].x = j * arrRandom2[i].width + j * 100 + count * 50;
+                // arrRandom[i].y = i * arrRandom[i].height + i* 500 + count * 50;
+                console.log('arr[i] = ', arrRandom[i])
+                // arrRandom[i].drawRect(ctx)
+                arrRandom2[i].drawRect(ctx)
+                // arrRandom[i].drawRect(ctx)
+
+            }
+
+
+            // arrRandom[i].y = i*arrRandom[i].height + 50;
+            // arrRandom[i].drawRect(ctx)
+        }
+        if (count > 2) {
+            count = 0;
+        }
+    }
+
+    // drawRandomRect();
+    console.log('arrRandom == ', arrRandom)
+
+    function downRect() {
+        clearCanvas();
+        drawRandomRect();
+        for (let i = 0; i < arrRandom.length; i++) {
+
+            arrRandom[i].moveDown();
+            arrRandom2[i].moveDown()
+            // arrRandom[i].moveRight();
+            if (arrRandom[i].y == canvas.height) {
+                arrRandom[i].y = 0;
+            }
+            if (arrRandom2[i].y == canvas.height) {
+                arrRandom2[i].y = 0;
+            }
+        }
+
+    }
+
+    let intervalId = setInterval(downRect, 500);
+
+    function initImage() {
+        image.onload = drawImageCar;
+        image.src = car.src
+        // rect.drawRect(ctx);
+        circle.drawCircle(ctx);
+    }
+
+    function drawImageCar() {
+        car.drawCar(ctx);
+    }
+
+    function moveCar() {
+        console.log('event ', event)
+        switch (event.keyCode) {
+            case  39:
+                car.setSrc('image/tank_right.png')
+                car.moveRight()
+                break
+            case 37:
+                car.moveLeft();
+                break;
+            case 38:
+                car.setSrc('image/tank_up.png')
+                car.moveUp();
+                break;
+            case 40:
+                car.moveDown();
+                break;
+        }
+        checkCollision();
+        clearCanvas();
+        initImage();
+    }
+
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+    }
+
+    function checkCollision() {
+        if (car.x + car.width > rect.x && car.x < rect.x + rect.width && car.y < rect.y + rect.height && car.y + car.height > rect.y) {
+            // alert('CÓ VA CHẠM')
+            car.setSrc('image/explosion.png');
+            let audio = new Audio('audio/boom.mp3')
+            audio.play();
+        }
+        if ((car.x + car.width > circle.x - circle.radius) && (car.x < circle.x + circle.radius)
+            && (car.y + car.height > circle.y - circle.radius && car.y < circle.y + circle.radius && car.x + car.width > circle.x - circle.radius / Math.sqrt(2) + 10)) {
+            car.setSrc('image/explosion.png');
+            let audio = new Audio('audio/boom.mp3')
+            audio.play();
+        }
+    }
+
+    initImage();
+    addEventListener('keydown', moveCar)
+    console.log('binh phuong', Math.sqrt(9))
+</script>
